@@ -1,5 +1,6 @@
 import os
 import customtkinter
+import keygen_window
 from tkinter import messagebox
 
 #Global Variables
@@ -68,7 +69,7 @@ class SafeMan(customtkinter.CTk):
         self.rfrshbtn = customtkinter.CTkButton(self.toolbar, text="Refresh Vault", height=40, width=120, command=self.refresh)
         self.rfrshbtn.place(x=387, y=12)
 
-        self.chngbtn = customtkinter.CTkButton(self.toolbar, text="Ecnrypt Vault with New Key", height=40, width=180)
+        self.chngbtn = customtkinter.CTkButton(self.toolbar, text="Ecnrypt Vault with New Key", height=40, width=180, command=self.initialiseVault)
         self.chngbtn.place(x=527, y=12)
 
         self.mainbarright = customtkinter.CTkFrame(self, width=220, height=240, corner_radius=20)
@@ -89,6 +90,13 @@ class SafeMan(customtkinter.CTk):
     def radiobutton_frame_event(self):
         print(f"radiobutton frame modified: {pwd}/.safeman-psw/{self.radiobutton_frame.get_checked_item()}.txt")
 
+
+    def initialiseVault(self):
+        if messagebox.askyesno('Initialise Vault"', 'Are you sure to create a new vault?', parent=self):
+            keygen_window.KeyGen()
+            self.disable_button()
+            
+
     #Refreshes the password vault.
     def refresh(self):
         if os.path.exists(f"{pwd}/.safeman-psw"):
@@ -107,15 +115,22 @@ class SafeMan(customtkinter.CTk):
         else:
             messagebox.showinfo('No Vault', 'No vault could not be found on your machine.', parent=self)
 
+
     #Deletes password from the vault.
     def deletepsw(self):
-        deletepss_question = messagebox.askquestion("Delete Password", f"{self.radiobutton_frame.get_checked_item()} will be deleted. Do you want to continue this process?", parent=self).upper()
-        if (deletepss_question[0]== "Y"):
-            self.radiobutton_frame.item_remove(self.radiobutton_frame.get_checked_item())
-            os.remove(f"{pwd}/.safeman-psw/{self.radiobutton_frame.get_checked_item()}.txt")
-            deleted_info = messagebox.showinfo("Password Deleted", f"{self.radiobutton_frame.get_checked_item()}  deleted successfulfy.", parent=self)
+    
+        if(self.radiobutton_frame.get_checked_item() == ""):
+            messagebox.showwarning("Error", "Please select a file to delete.", parent=self)
+    
         else:
-            return None
+            deletepss_question = messagebox.askquestion("Delete Password", f"{self.radiobutton_frame.get_checked_item()} will be deleted. Do you want to continue this process?", parent=self).upper()
+            if (deletepss_question[0]== "Y"):
+                self.radiobutton_frame.item_remove(self.radiobutton_frame.get_checked_item())
+                os.remove(f"{pwd}/.safeman-psw/{self.radiobutton_frame.get_checked_item()}.txt")
+                deleted_info = messagebox.showinfo("Password Deleted", f"{self.radiobutton_frame.get_checked_item()}  deleted successfulfy.", parent=self)
+            else:
+                return None
+            
 
     def disable_button(self):
         self.rfrshbtn.configure(state= customtkinter.DISABLED)
@@ -131,10 +146,6 @@ class SafeMan(customtkinter.CTk):
         self.addpassbtn.configure(state= customtkinter.NORMAL)
         self.rempassbtn.configure(state= customtkinter.NORMAL)
         self.seepassbtn.configure(state= customtkinter.NORMAL)
-
-
-    def disable_close(self):
-        pass
 
 
     def quit_app(self):
