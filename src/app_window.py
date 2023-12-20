@@ -21,7 +21,7 @@ class RadioButtonFrame(customtkinter.CTkScrollableFrame):
                     self.all_items.append(self.replaced)
                     self.item_add(f"{self.replaced}")
         
-
+    #Adds radiobutton item
     def item_add(self, item):
         radiobutton = customtkinter.CTkRadioButton(self, text=item, value=item, variable=self.radiobutton_variable)
         if self.command is not None:
@@ -29,6 +29,7 @@ class RadioButtonFrame(customtkinter.CTkScrollableFrame):
         radiobutton.grid(row=len(self.radiobutton_list), pady=(0, 12))
         self.radiobutton_list.append(radiobutton)
 
+    #Removes radiobutton item
     def item_remove(self, item):
         for radiobutton in self.radiobutton_list:
             if item == radiobutton.cget("text"):
@@ -88,6 +89,7 @@ class SafeMan(customtkinter.CTk):
     def radiobutton_frame_event(self):
         print(f"radiobutton frame modified: {pwd}/.safeman-psw/{self.radiobutton_frame.get_checked_item()}.txt")
 
+    #Refreshes the password vault.
     def refresh(self):
         if os.path.exists(f"{pwd}/.safeman-psw"):
             self.subdir_file_arr = []
@@ -105,6 +107,7 @@ class SafeMan(customtkinter.CTk):
         else:
             messagebox.showinfo('No Vault', 'No vault could not be found on your machine.', parent=self)
 
+    #Deletes password from the vault.
     def deletepsw(self):
         deletepss_question = messagebox.askquestion("Delete Password", f"{self.radiobutton_frame.get_checked_item()} will be deleted. Do you want to continue this process?", parent=self).upper()
         if (deletepss_question[0]== "Y"):
