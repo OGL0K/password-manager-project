@@ -5,7 +5,7 @@ from tkinter import messagebox
 #Global Variables
 pwd = os.path.expanduser('~')
 
-class ScrollableRadiobuttonFrame(customtkinter.CTkScrollableFrame):
+class RadioButtonFrame(customtkinter.CTkScrollableFrame):
     def __init__(self, master, command=None, **kwargs):
         super().__init__(master, **kwargs)
 
@@ -15,21 +15,21 @@ class ScrollableRadiobuttonFrame(customtkinter.CTkScrollableFrame):
 
         self.all_items = []
         for main_path, sub_directories, files in os.walk(f"{pwd}/.safeman-psw"):
-            for file_name in files:
+            for file_name in sorted(files):
                 if file_name.endswith('.txt'):
                     self.replaced = file_name.replace(".txt", "")
                     self.all_items.append(self.replaced)
-                    self.add_item(f"{self.replaced}")
+                    self.item_add(f"{self.replaced}")
         
 
-    def add_item(self, item):
+    def item_add(self, item):
         radiobutton = customtkinter.CTkRadioButton(self, text=item, value=item, variable=self.radiobutton_variable)
         if self.command is not None:
             radiobutton.configure(command=self.command)
         radiobutton.grid(row=len(self.radiobutton_list), pady=(0, 12))
         self.radiobutton_list.append(radiobutton)
 
-    def remove_item(self, item):
+    def item_remove(self, item):
         for radiobutton in self.radiobutton_list:
             if item == radiobutton.cget("text"):
                 radiobutton.destroy()
@@ -76,35 +76,43 @@ class SafeMan(customtkinter.CTk):
         self.addpassbtn = customtkinter.CTkButton(self.mainbarright, text="Add Password", height=40, width=170)
         self.addpassbtn.place(x=25, y=30)
 
-        self.rempassbtn = customtkinter.CTkButton(self.mainbarright, text="Remove Password", height=40, width=170)
+        self.rempassbtn = customtkinter.CTkButton(self.mainbarright, text="Delete Password", height=40, width=170, command=self.deletepsw)
         self.rempassbtn.place(x=25, y=100)
 
         self.seepassbtn = customtkinter.CTkButton(self.mainbarright, text="See Password", height=40, width=170)
         self.seepassbtn.place(x=25, y=170)
 
-        self.scrollable_radiobutton_frame = ScrollableRadiobuttonFrame(self, width=390, corner_radius=20, command=self.radiobutton_frame_event)
-        self.scrollable_radiobutton_frame.place(x=30, y=90)
+        self.radiobutton_frame = RadioButtonFrame(self, width=390, corner_radius=20, command=self.radiobutton_frame_event)
+        self.radiobutton_frame.place(x=30, y=90)
 
     def radiobutton_frame_event(self):
-        print(f"radiobutton frame modified: {pwd}/.safeman-psw/{self.scrollable_radiobutton_frame.get_checked_item()}.txt")
+        print(f"radiobutton frame modified: {pwd}/.safeman-psw/{self.radiobutton_frame.get_checked_item()}.txt")
 
     def refresh(self):
         if os.path.exists(f"{pwd}/.safeman-psw"):
             self.subdir_file_arr = []
-            for i in range (0, len(self.scrollable_radiobutton_frame.radiobutton_list)):
-                self.scrollable_radiobutton_frame.remove_item(self.scrollable_radiobutton_frame.all_items[i])
+            for i in range (0, len(self.radiobutton_frame.radiobutton_list)):
+                self.radiobutton_frame.item_remove(self.radiobutton_frame.all_items[i])
 
             for main_path, sub_directories, files in os.walk(f"{pwd}/.safeman-psw"):
-                for file_name in files:
+                for file_name in sorted(files):
                     if file_name.endswith('.txt'):
-                        self.scrollable_radiobutton_frame.replaced = file_name.replace(".txt", "")
-                        self.scrollable_radiobutton_frame.all_items.append(self.scrollable_radiobutton_frame.replaced)
-                        self.scrollable_radiobutton_frame.add_item(f"{self.scrollable_radiobutton_frame.replaced}")
+                        self.radiobutton_frame.replaced = file_name.replace(".txt", "")
+                        self.radiobutton_frame.all_items.append(self.radiobutton_frame.replaced)
+                        self.radiobutton_frame.item_add(f"{self.radiobutton_frame.replaced}")
             
             messagebox.showinfo('Refreshed', 'Your password vault has been refreshed.', parent=self)
         else:
             messagebox.showinfo('No Vault', 'No vault could not be found on your machine.', parent=self)
 
+    def deletepsw(self):
+        deletepss_question = messagebox.askquestion("Delete Password", f"{self.radiobutton_frame.get_checked_item()} will be deleted. Do you want to continue this process?", parent=self).upper()
+        if (deletepss_question[0]== "Y"):
+            self.radiobutton_frame.item_remove(self.radiobutton_frame.get_checked_item())
+            os.remove(f"{pwd}/.safeman-psw/{self.radiobutton_frame.get_checked_item()}.txt")
+            deleted_info = messagebox.showinfo("Password Deleted", f"{self.radiobutton_frame.get_checked_item()}  deleted successfulfy.", parent=self)
+        else:
+            return None
 
     def disable_button(self):
         self.rfrshbtn.configure(state= customtkinter.DISABLED)
@@ -124,6 +132,7 @@ class SafeMan(customtkinter.CTk):
 
     def disable_close(self):
         pass
+
 
     def quit_app(self):
         quit_question = messagebox.askquestion('Exit App', 'Are you sure exitting the applicaiton?', parent=self).upper()
