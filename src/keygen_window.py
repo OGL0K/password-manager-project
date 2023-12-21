@@ -51,6 +51,43 @@ class KeyGen(customtkinter.CTkToplevel):
         self.input_entry.place(x=80,y=63)
         
 
+    def checkPassphrase(self):
+        special_characters = "!@#$%^&*()-+?_=,<>/"
+        alphabet = "abcdefghijklmnopqrstuvwxyz"  
+        numbers = "0123456789"
+        passphrase = self.input_entry3.get()
+
+        if passphrase == "":
+            messagebox.showinfo('Invalid Passphrase', 'Passphrase should not be empty.', parent=self)
+
+        else:
+            if any(c in special_characters or c in numbers for c in passphrase) and any(c in alphabet.upper() or c in alphabet for c in passphrase) and len(passphrase) >=8:
+                self.geometry("420x150")
+                self.input_label.configure(text="Please re-enter your new passphrase")
+                self.label.destroy()
+                self.label2.destroy()
+                self.input_entry3.destroy()
+                self.input_entry5 = customtkinter.CTkEntry(self, show="*", width=270)
+                self.input_entry5.place(x=80,y=63)
+                self.enter_button.configure()
+                self.enter_button.place(x=110,y=110)
+                self.cancel_button.place(x=195,y=110)
+
+            else:
+                if messagebox.askyesno('Weak Passphrase', 'Your passphrase is not considered strong. Do you wish to use this one?', parent=self):
+                    self.title("Passphrase Entry for GPG Key & Pass Storage Generation")
+                    self.geometry("420x150")
+                    self.input_label.configure(text="Please re-enter your new passphrase")
+                    self.label.destroy()
+                    self.label2.destroy()
+                    self.input_entry3.destroy()
+                    self.input_entry5 = customtkinter.CTkEntry(self, show="*", width=270)
+                    self.input_entry5.place(x=80,y=63)
+                    self.enter_button.configure()
+                    self.enter_button.place(x=110,y=110)
+                    self.cancel_button.place(x=195,y=110)
+
+
     def checkEamil(self):
         gtEmail = self.input_entry2.get()
         regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]{1,}\b"
@@ -69,6 +106,7 @@ class KeyGen(customtkinter.CTkToplevel):
             self.title_label.configure(text="Key Generation - Passphrase")
             self.input_entry3 = customtkinter.CTkEntry(self, show="*", width=270)
             self.input_entry3.place(x=80,y=118)
+            self.enter_button.configure(command=self.checkPassphrase)
             self.enter_button.place(y=158)
             self.cancel_button.place(y=158)
 
