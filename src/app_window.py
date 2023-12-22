@@ -5,6 +5,7 @@ from tkinter import messagebox
 
 #Global Variables
 pwd = os.path.expanduser('~')
+pswVault = f"{pwd}/.safeman-psw/"
 
 class RadioButtonFrame(customtkinter.CTkScrollableFrame):
     def __init__(self, master, command=None, **kwargs):
@@ -51,7 +52,7 @@ class SafeMan(customtkinter.CTk):
 
         #Centering the application
         width = 750
-        height = 350 
+        height = 350
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         x = (screen_width/2) - (width/2)
@@ -67,25 +68,37 @@ class SafeMan(customtkinter.CTk):
         self.maintitle.place(x=65, y=16)
 
         self.rfrshbtn = customtkinter.CTkButton(self.toolbar, text="Refresh Vault", height=40, width=120, command=self.refresh)
-        self.rfrshbtn.place(x=387, y=12)
 
-        self.chngbtn = customtkinter.CTkButton(self.toolbar, text="Ecnrypt Vault with New Key", height=40, width=180, command=self.initialiseVault)
-        self.chngbtn.place(x=527, y=12)
+        self.chngbtn = customtkinter.CTkButton(self.toolbar, text="Ecnrypt Vault with New Key", height=40, width=180)
 
         self.mainbarright = customtkinter.CTkFrame(self, width=220, height=240, corner_radius=20)
-        self.mainbarright.place(x=490, y=90)
 
         self.addpassbtn = customtkinter.CTkButton(self.mainbarright, text="Add Password", height=40, width=170)
-        self.addpassbtn.place(x=25, y=30)
 
         self.rempassbtn = customtkinter.CTkButton(self.mainbarright, text="Delete Password", height=40, width=170, command=self.deletepsw)
-        self.rempassbtn.place(x=25, y=100)
 
         self.seepassbtn = customtkinter.CTkButton(self.mainbarright, text="See Password", height=40, width=170)
-        self.seepassbtn.place(x=25, y=170)
 
         self.radiobutton_frame = RadioButtonFrame(self, width=390, corner_radius=20, command=self.radiobutton_frame_event)
-        self.radiobutton_frame.place(x=30, y=90)
+
+        self.introfrm = customtkinter.CTkFrame(self, width=600, height=200, corner_radius=10)
+        
+        self.introlbl = customtkinter.CTkLabel(self.introfrm, text="We could not locate your password vault :(", font=customtkinter.CTkFont(size=16, weight="bold"))
+        
+        self.introlbl2 = customtkinter.CTkLabel(self.introfrm, text="Please click the left button below to create your new password vault or", font=customtkinter.CTkFont(size=14, weight="bold"))
+        
+        self.introlbl3 = customtkinter.CTkLabel(self.introfrm, text="we can try again to search your password vault by clicking the right button.", font=customtkinter.CTkFont(size=14, weight="bold"))
+        
+        self.initVaultbtn = customtkinter.CTkButton(self.introfrm, text="Create Vault", height=40, width=170, command=self.initialiseVault)
+        
+        self.fndVaultbtn = customtkinter.CTkButton(self.introfrm, text="Try Again", height=40, width=170)
+       
+        
+        if os.path.exists(pswVault):
+            self.placeVaultButtons()
+        else:
+            self.placeIntroButtons()
+        
 
     def radiobutton_frame_event(self):
         print(f"radiobutton frame modified: {pwd}/.safeman-psw/{self.radiobutton_frame.get_checked_item()}.txt")
@@ -130,7 +143,42 @@ class SafeMan(customtkinter.CTk):
                 deleted_info = messagebox.showinfo("Password Deleted", f"{self.radiobutton_frame.get_checked_item()}  deleted successfulfy.", parent=self)
             else:
                 return None
-            
+
+
+
+    def placeVaultButtons(self):
+
+        self.introfrm.place_forget()
+        self.introlbl.place_forget()
+        self.introlbl2.place_forget()
+        self.introlbl3.place_forget()
+        self.initVaultbtn.place_forget()
+        self.fndVaultbtn.place_forget()
+
+
+        self.rfrshbtn.place(x=387, y=12)
+        self.chngbtn.place(x=527, y=12)
+        self.mainbarright.place(x=490, y=90)
+        self.addpassbtn.place(x=25, y=30)
+        self.rempassbtn.place(x=25, y=100)
+        self.seepassbtn.place(x=25, y=170)
+        self.radiobutton_frame.place(x=30, y=90)
+        
+    def placeIntroButtons(self):
+        self.rfrshbtn.place_forget()
+        self.chngbtn.place_forget()
+        self.addpassbtn.place_forget()
+        self.rempassbtn.place_forget()
+        self.seepassbtn.place_forget()
+
+
+        self.introfrm.place(x=75, y=100)
+        self.introlbl.place(x=120, y=20)
+        self.introlbl2.place(x=55, y=55)
+        self.introlbl3.place(x=45, y=80)
+        self.initVaultbtn.place(x=100, y=130)
+        self.fndVaultbtn.place(x=320, y=130)
+
 
     def disable_button(self):
         self.rfrshbtn.configure(state= customtkinter.DISABLED)

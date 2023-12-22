@@ -7,7 +7,8 @@ from app_window import SafeMan
 from tkinter import messagebox
 
 #Global Variables
-pwd = os.path.expanduser('~')
+pwd = os.path.expanduser("~")
+entryChance = 3
 
 class KeyGen(customtkinter.CTkToplevel):
     def __init__(self, *args, **kwargs):
@@ -49,27 +50,65 @@ class KeyGen(customtkinter.CTkToplevel):
         self.vcmd = (self.register(validate), '%P')
         self.input_entry = customtkinter.CTkEntry(self, width=270, validate="key", validatecommand=self.vcmd)
         self.input_entry.place(x=80,y=63)
-        
+    
+
+    def vaultGeneration(self):
+        global entryChance
+        self.re_passphrase = self.input_entry4.get()
+        if (self.passphrase == self.re_passphrase):
+            gpg = gnupg.GPG()
+
+            #GPG Key Generation
+            key_info = gpg.gen_key_input( 
+                name_real=self.gtname, 
+                name_email=self.gtEmail,
+                passphrase=self.passphrase, 
+                key_type='eddsa', 
+                key_curve='ed25519', 
+                key_usage='sign', 
+                subkey_type='ecdh', 
+                subkey_curve='cv25519')
+            
+            key = gpg.gen_key(key_info)
+            os.makedirs(os.path.dirname(f"{pwd}/.safeman-psw/"), exist_ok=True)
+            keyIDFile = open(f"{pwd}/.safeman-psw/.key_id", "w")
+            keyIDFile.write(str(key))
+            keyIDFile.close()
+
+            self.passphrase = ""
+            self.re_passphrase = ""
+            messagebox.showinfo('Success', 'Your password vault has been created.', parent=self)
+            self.destroy()
+            SafeMan.placeVaultButtons(SafeMan())
+        else:
+            entryChance -= 1
+            if entryChance <= 0:
+                messagebox.showinfo('', 'Symmetric encryption could not be completed due to incorrent passphrase input.', parent=self)
+                self.re_passphrase = ""
+                self.passphrase = ""
+                self.destroy()
+            else:
+                messagebox.showinfo('Bad Passphrase', f'Passphrases do not match (try {entryChance} out of 3)', parent=self)
 
     def checkPassphrase(self):
         special_characters = "!@#$%^&*()-+?_=,<>/"
         alphabet = "abcdefghijklmnopqrstuvwxyz"  
         numbers = "0123456789"
-        passphrase = self.input_entry3.get()
+        self.passphrase = self.input_entry3.get()
 
-        if passphrase == "":
+        if self.passphrase == "":
             messagebox.showinfo('Invalid Passphrase', 'Passphrase should not be empty.', parent=self)
 
         else:
-            if any(c in special_characters or c in numbers for c in passphrase) and any(c in alphabet.upper() or c in alphabet for c in passphrase) and len(passphrase) >=8:
+            if any(c in special_characters or c in numbers for c in self.passphrase) and any(c in alphabet.upper() or c in alphabet for c in self.passphrase) and len(self.passphrase) >=8:
                 self.geometry("420x150")
                 self.input_label.configure(text="Please re-enter your new passphrase")
                 self.label.destroy()
                 self.label2.destroy()
                 self.input_entry3.destroy()
-                self.input_entry5 = customtkinter.CTkEntry(self, show="*", width=270)
-                self.input_entry5.place(x=80,y=63)
-                self.enter_button.configure()
+                self.input_entry4 = customtkinter.CTkEntry(self, show="*", width=270)
+                self.input_entry4.place(x=80,y=63)
+                self.enter_button.configure(command=self.vaultGeneration)
                 self.enter_button.place(x=110,y=110)
                 self.cancel_button.place(x=195,y=110)
 
@@ -81,18 +120,18 @@ class KeyGen(customtkinter.CTkToplevel):
                     self.label.destroy()
                     self.label2.destroy()
                     self.input_entry3.destroy()
-                    self.input_entry5 = customtkinter.CTkEntry(self, show="*", width=270)
-                    self.input_entry5.place(x=80,y=63)
-                    self.enter_button.configure()
+                    self.input_entry4 = customtkinter.CTkEntry(self, show="*", width=270)
+                    self.input_entry4.place(x=80,y=63)
+                    self.enter_button.configure(command=self.vaultGeneration)
                     self.enter_button.place(x=110,y=110)
                     self.cancel_button.place(x=195,y=110)
 
 
     def checkEamil(self):
-        gtEmail = self.input_entry2.get()
+        self.gtEmail = self.input_entry2.get()
         regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]{1,}\b"
 
-        if re.fullmatch(regex, gtEmail):
+        if re.fullmatch(regex, self.gtEmail):
             self.geometry("500x200")
             self.input_entry2.destroy()
             self.input_label.configure(text="Please create a passphrase.")
@@ -110,7 +149,7 @@ class KeyGen(customtkinter.CTkToplevel):
             self.enter_button.place(y=158)
             self.cancel_button.place(y=158)
 
-        elif gtEmail.isascii() == False:
+        elif self.gtEmail.isascii() == False:
             messagebox.showinfo('Invalid Email', 'Email should not contain non-ascii characters.', parent=self)
         else:
             messagebox.showinfo('Invalid Email','The email address you put is not valid.', parent=self)
@@ -118,10 +157,10 @@ class KeyGen(customtkinter.CTkToplevel):
 
 
     def checkName(self):
-        gtname = self.input_entry.get()
-        if gtname == "":
+        self.gtname = self.input_entry.get()
+        if self.gtname == "":
             messagebox.showinfo('Invalid Name', 'Name should not be empty.', parent=self)
-        elif gtname.isascii() == False:
+        elif self.gtname.isascii() == False:
             messagebox.showinfo('Invalid Name', 'Name should not contain non-ascii characters.', parent=self)
         else:
             self.title_label.configure(text="Key Generation - E-Mail")
