@@ -18,8 +18,8 @@ class RadioButtonFrame(customtkinter.CTkScrollableFrame):
         self.all_items = []
         for main_path, sub_directories, files in os.walk(f"{pwd}/.safeman-psw"):
             for file_name in sorted(files):
-                if file_name.endswith('.txt'):
-                    self.replaced = file_name.replace(".txt", "")
+                if file_name.endswith('.gpg'):
+                    self.replaced = file_name.replace(".gpg", "")
                     self.all_items.append(self.replaced)
                     self.item_add(f"{self.replaced}")
         
@@ -83,17 +83,14 @@ class SafeMan(customtkinter.CTk):
 
         self.introfrm = customtkinter.CTkFrame(self, width=600, height=200, corner_radius=10)
         
-        self.introlbl = customtkinter.CTkLabel(self.introfrm, text="We could not locate your password vault :(", font=customtkinter.CTkFont(size=16, weight="bold"))
+        self.introlbl = customtkinter.CTkLabel(self.introfrm, text="We could not locate your password vault :(", font=customtkinter.CTkFont(size=18, weight="bold"))
         
-        self.introlbl2 = customtkinter.CTkLabel(self.introfrm, text="Please click the left button below to create your new password vault or", font=customtkinter.CTkFont(size=14, weight="bold"))
-        
-        self.introlbl3 = customtkinter.CTkLabel(self.introfrm, text="we can try again to search your password vault by clicking the right button.", font=customtkinter.CTkFont(size=14, weight="bold"))
+        self.introlbl2 = customtkinter.CTkLabel(self.introfrm, text="Please click the button below to create your new password vault.", font=customtkinter.CTkFont(size=16, weight="bold"))
         
         self.initVaultbtn = customtkinter.CTkButton(self.introfrm, text="Create Vault", height=40, width=170, command=self.initialiseVault)
         
-        self.fndVaultbtn = customtkinter.CTkButton(self.introfrm, text="Try Again", height=40, width=170)
+        self.fndVaultbtn = customtkinter.CTkButton(self.introfrm, text="Exit App", height=40, width=170, command=self.quit_app)
        
-        
         if os.path.exists(pswVault):
             self.placeVaultButtons()
         else:
@@ -119,14 +116,15 @@ class SafeMan(customtkinter.CTk):
 
             for main_path, sub_directories, files in os.walk(f"{pwd}/.safeman-psw"):
                 for file_name in sorted(files):
-                    if file_name.endswith('.txt'):
-                        self.radiobutton_frame.replaced = file_name.replace(".txt", "")
+                    if file_name.endswith('.gpg'):
+                        self.radiobutton_frame.replaced = file_name.replace(".gpg", "")
                         self.radiobutton_frame.all_items.append(self.radiobutton_frame.replaced)
                         self.radiobutton_frame.item_add(f"{self.radiobutton_frame.replaced}")
             
             messagebox.showinfo('Refreshed', 'Your password vault has been refreshed.', parent=self)
         else:
             messagebox.showinfo('No Vault', 'No vault could not be found on your machine.', parent=self)
+            self.placeIntroButtons()
 
 
     #Deletes password from the vault.
@@ -151,7 +149,6 @@ class SafeMan(customtkinter.CTk):
         self.introfrm.place_forget()
         self.introlbl.place_forget()
         self.introlbl2.place_forget()
-        self.introlbl3.place_forget()
         self.initVaultbtn.place_forget()
         self.fndVaultbtn.place_forget()
 
@@ -173,10 +170,9 @@ class SafeMan(customtkinter.CTk):
 
 
         self.introfrm.place(x=75, y=100)
-        self.introlbl.place(x=120, y=20)
+        self.introlbl.place(x=115, y=20)
         self.introlbl2.place(x=55, y=55)
-        self.introlbl3.place(x=45, y=80)
-        self.initVaultbtn.place(x=100, y=130)
+        self.initVaultbtn.place(x=110, y=130)
         self.fndVaultbtn.place(x=320, y=130)
 
 

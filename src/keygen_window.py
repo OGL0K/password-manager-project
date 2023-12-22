@@ -11,6 +11,7 @@ pwd = os.path.expanduser("~")
 entryChance = 3
 
 class KeyGen(customtkinter.CTkToplevel):
+    global event
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -34,11 +35,13 @@ class KeyGen(customtkinter.CTkToplevel):
         self.input_label = customtkinter.CTkLabel(self, text ="Please put your real name.", font=customtkinter.CTkFont(size=12, weight="bold"))
         self.input_label.place(x=80,y=35)
 
-        self.enter_button = customtkinter.CTkButton(self, text="Enter", width=60, command=self.checkName)
+        self.enter_button = customtkinter.CTkButton(self, text="Enter", width=60, command= lambda: self.checkName(self.bind()))
         self.enter_button.place(x=110,y=110)
 
         self.cancel_button = customtkinter.CTkButton(self, text="Cancel Generation", width=60, command=self.cancelProcess)
         self.cancel_button.place(x=195,y=110)
+
+        self.bind('<Return>', self.checkName)
 
         def validate(P):    
             if len(P) > 20:
@@ -52,7 +55,7 @@ class KeyGen(customtkinter.CTkToplevel):
         self.input_entry.place(x=80,y=63)
     
 
-    def vaultGeneration(self):
+    def vaultGeneration(self, event):
         global entryChance
         self.re_passphrase = self.input_entry4.get()
         if (self.passphrase == self.re_passphrase):
@@ -90,7 +93,8 @@ class KeyGen(customtkinter.CTkToplevel):
             else:
                 messagebox.showinfo('Bad Passphrase', f'Passphrases do not match (try {entryChance} out of 3)', parent=self)
 
-    def checkPassphrase(self):
+    def checkPassphrase(self, event):
+        self.bind('<Return>', self.vaultGeneration)
         special_characters = "!@#$%^&*()-+?_=,<>/"
         alphabet = "abcdefghijklmnopqrstuvwxyz"  
         numbers = "0123456789"
@@ -108,7 +112,7 @@ class KeyGen(customtkinter.CTkToplevel):
                 self.input_entry3.destroy()
                 self.input_entry4 = customtkinter.CTkEntry(self, show="*", width=270)
                 self.input_entry4.place(x=80,y=63)
-                self.enter_button.configure(command=self.vaultGeneration)
+                self.enter_button.configure(command=lambda:self.vaultGeneration(self.bind()))
                 self.enter_button.place(x=110,y=110)
                 self.cancel_button.place(x=195,y=110)
 
@@ -122,12 +126,13 @@ class KeyGen(customtkinter.CTkToplevel):
                     self.input_entry3.destroy()
                     self.input_entry4 = customtkinter.CTkEntry(self, show="*", width=270)
                     self.input_entry4.place(x=80,y=63)
-                    self.enter_button.configure(command=self.vaultGeneration)
+                    self.enter_button.configure(command=lambda:self.vaultGeneration(self.bind()))
                     self.enter_button.place(x=110,y=110)
                     self.cancel_button.place(x=195,y=110)
 
 
-    def checkEamil(self):
+    def checkEmail(self, event):
+        self.bind('<Return>', self.checkPassphrase)
         self.gtEmail = self.input_entry2.get()
         regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]{1,}\b"
 
@@ -145,7 +150,7 @@ class KeyGen(customtkinter.CTkToplevel):
             self.title_label.configure(text="Key Generation - Passphrase")
             self.input_entry3 = customtkinter.CTkEntry(self, show="*", width=270)
             self.input_entry3.place(x=80,y=118)
-            self.enter_button.configure(command=self.checkPassphrase)
+            self.enter_button.configure(command=lambda:self.checkPassphrase(self.bind()))
             self.enter_button.place(y=158)
             self.cancel_button.place(y=158)
 
@@ -156,7 +161,8 @@ class KeyGen(customtkinter.CTkToplevel):
 
 
 
-    def checkName(self):
+    def checkName(self, event):
+        self.bind('<Return>', self.checkEmail)
         self.gtname = self.input_entry.get()
         if self.gtname == "":
             messagebox.showinfo('Invalid Name', 'Name should not be empty.', parent=self)
@@ -168,15 +174,19 @@ class KeyGen(customtkinter.CTkToplevel):
             self.input_label.configure(text="Please put your email address.", font=customtkinter.CTkFont(size=12, weight="bold"))
             self.input_entry2 = customtkinter.CTkEntry(self, width=270)
             self.input_entry2.place(x=80,y=63)
-            self.enter_button.configure(command=self.checkEamil)
-
+            self.enter_button.configure(command= lambda: self.checkEmail(self.bind()))
 
 
 
     def cancelProcess(self):
         if messagebox.askyesno('Cancel Process', 'Are you sure to cancel your vault initiation process?', parent=self):
-            self.destroy()
-            SafeMan.enable_button(SafeMan())
+            try:
+                self.destroy()
+                SafeMan.enable_button(SafeMan())
+                self.passphrase = ""
+                self.re_passphrase = ""
+            except AttributeError:
+                pass
 
 
     def disable_close(self):
