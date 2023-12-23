@@ -3,7 +3,7 @@ import re
 import gnupg
 import customtkinter
 
-from app_window import SafeMan
+import app_window
 from tkinter import messagebox
 
 #Global Variables
@@ -19,6 +19,7 @@ class KeyGen(customtkinter.CTkToplevel):
         width = 430
         height = 180
 
+        self.grab_set()
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
 
@@ -82,7 +83,7 @@ class KeyGen(customtkinter.CTkToplevel):
             self.re_passphrase = ""
             messagebox.showinfo('Success', 'Your password vault has been created.', parent=self)
             self.destroy()
-            SafeMan.placeVaultButtons(SafeMan())
+
         else:
             entryChance -= 1
             if entryChance <= 0:
@@ -92,6 +93,7 @@ class KeyGen(customtkinter.CTkToplevel):
                 self.destroy()
             else:
                 messagebox.showinfo('Bad Passphrase', f'Passphrases do not match (try {entryChance} out of 3)', parent=self)
+
 
     def checkPassphrase(self, event):
         self.bind('<Return>', self.vaultGeneration)
@@ -182,7 +184,6 @@ class KeyGen(customtkinter.CTkToplevel):
         if messagebox.askyesno('Cancel Process', 'Are you sure to cancel your vault initiation process?', parent=self):
             try:
                 self.destroy()
-                SafeMan.enable_button(SafeMan())
                 self.passphrase = ""
                 self.re_passphrase = ""
             except AttributeError:

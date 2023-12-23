@@ -1,6 +1,7 @@
 import os
 import customtkinter
 import keygen_window
+import unlpsw_window
 from tkinter import messagebox
 
 #Global Variables
@@ -77,9 +78,9 @@ class SafeMan(customtkinter.CTk):
 
         self.rempassbtn = customtkinter.CTkButton(self.mainbarright, text="Delete Password", height=40, width=170, command=self.deletepsw)
 
-        self.seepassbtn = customtkinter.CTkButton(self.mainbarright, text="See Password", height=40, width=170)
+        self.unlpassbtn = customtkinter.CTkButton(self.mainbarright, text="Unlock Password", height=40, width=170, command=self.UnlPsw)
 
-        self.radiobutton_frame = RadioButtonFrame(self, width=390, corner_radius=20, command=self.radiobutton_frame_event)
+        self.radiobutton_frame = RadioButtonFrame(self, width=390, corner_radius=20)
 
         self.introfrm = customtkinter.CTkFrame(self, width=600, height=200, corner_radius=10)
         
@@ -89,23 +90,45 @@ class SafeMan(customtkinter.CTk):
         
         self.initVaultbtn = customtkinter.CTkButton(self.introfrm, text="Create Vault", height=40, width=170, command=self.initialiseVault)
         
-        self.fndVaultbtn = customtkinter.CTkButton(self.introfrm, text="Exit App", height=40, width=170, command=self.quit_app)
+        self.fndVaultbtn = customtkinter.CTkButton(self.introfrm, text="Start", height=40, width=170, command=self.startVault)
        
         if os.path.exists(pswVault):
             self.placeVaultButtons()
         else:
             self.placeIntroButtons()
-        
 
-    def radiobutton_frame_event(self):
-        print(f"radiobutton frame modified: {pwd}/.safeman-psw/{self.radiobutton_frame.get_checked_item()}.txt")
+    
+    def UnlPsw(self):
+        if(self.radiobutton_frame.get_checked_item() == ""):
+            messagebox.showwarning("Error", "Please select a file to unlock.", parent=self)
+
+        elif (messagebox.askyesno('Unlock Password', f'Are you sure to {self.radiobutton_frame.get_checked_item()} unlock ?', parent=self)):
+            getPswPth = f"{pwd}/.safeman-psw/{self.radiobutton_frame.get_checked_item()}.gpg"
+            unlpsw_window.UnlockPsw(getPswPth)
+    
+    
+    def startVault(self):
+        if os.path.exists(f"{pwd}/.safeman-psw"):
+            messagebox.showinfo("Success", "Welcome to SafeMan :D", parent=self)
+            self.placeVaultButtons()
+
+        else:
+            messagebox.showwarning("Error", "Please create your vault first to start.", parent=self)
 
 
     def initialiseVault(self):
-        if messagebox.askyesno('Initialise Vault"', 'Are you sure to create a new vault?', parent=self):
-            keygen_window.KeyGen()
-            self.disable_button()
+        if os.path.exists(f"{pwd}/.safeman-psw"):
+            messagebox.showinfo('Vault Already Created', 'You have already created your vault. You can start using it by pressing the "Start" button!', parent=self)
+
+        else:
+            if messagebox.askyesno('Initialise Vault', 'Are you sure to create a new vault?', parent=self):
+                keygen_window.KeyGen()
             
+
+    def intrRefresh(self):
+        if os.path.exists(f"{pwd}/.safeman-psw"):
+            self.placeVaultButtons()
+        
 
     #Refreshes the password vault.
     def refresh(self):
@@ -143,7 +166,6 @@ class SafeMan(customtkinter.CTk):
                 return None
 
 
-
     def placeVaultButtons(self):
 
         self.introfrm.place_forget()
@@ -158,15 +180,18 @@ class SafeMan(customtkinter.CTk):
         self.mainbarright.place(x=490, y=90)
         self.addpassbtn.place(x=25, y=30)
         self.rempassbtn.place(x=25, y=100)
-        self.seepassbtn.place(x=25, y=170)
+        self.unlpassbtn.place(x=25, y=170)
         self.radiobutton_frame.place(x=30, y=90)
+     
         
     def placeIntroButtons(self):
         self.rfrshbtn.place_forget()
         self.chngbtn.place_forget()
+        self.mainbarright.place_forget()
         self.addpassbtn.place_forget()
         self.rempassbtn.place_forget()
-        self.seepassbtn.place_forget()
+        self.unlpassbtn.place_forget()
+        self.radiobutton_frame.place_forget()
 
 
         self.introfrm.place(x=75, y=100)
@@ -181,7 +206,8 @@ class SafeMan(customtkinter.CTk):
         self.chngbtn.configure(state= customtkinter.DISABLED)
         self.addpassbtn.configure(state= customtkinter.DISABLED)
         self.rempassbtn.configure(state= customtkinter.DISABLED)
-        self.seepassbtn.configure(state= customtkinter.DISABLED)
+        self.unlpassbtn.configure(state= customtkinter.DISABLED)
+        self.initVaultbtn.configure(state= customtkinter.DISABLED)
     
 
     def enable_button(self):
@@ -189,7 +215,8 @@ class SafeMan(customtkinter.CTk):
         self.chngbtn.configure(state= customtkinter.NORMAL)
         self.addpassbtn.configure(state= customtkinter.NORMAL)
         self.rempassbtn.configure(state= customtkinter.NORMAL)
-        self.seepassbtn.configure(state= customtkinter.NORMAL)
+        self.unlpassbtn.configure(state= customtkinter.NORMAL)
+        self.initVaultbtn.configure(state= customtkinter.NORMAL)
 
 
     def quit_app(self):
