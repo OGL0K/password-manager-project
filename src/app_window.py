@@ -2,6 +2,7 @@ import os
 import customtkinter
 import keygen_window
 import unlpsw_window
+import addpsw_window
 from tkinter import messagebox
 
 #Global Variables
@@ -29,7 +30,7 @@ class RadioButtonFrame(customtkinter.CTkScrollableFrame):
         radiobutton = customtkinter.CTkRadioButton(self, text=item, value=item, variable=self.radiobutton_variable)
         if self.command is not None:
             radiobutton.configure(command=self.command)
-        radiobutton.grid(row=len(self.radiobutton_list), pady=(0, 12))
+        radiobutton.grid(row=len(self.radiobutton_list), pady=(0, 10), sticky="W")
         self.radiobutton_list.append(radiobutton)
 
     #Removes radiobutton item
@@ -74,7 +75,7 @@ class SafeMan(customtkinter.CTk):
 
         self.mainbarright = customtkinter.CTkFrame(self, width=220, height=240, corner_radius=20)
 
-        self.addpassbtn = customtkinter.CTkButton(self.mainbarright, text="Add Password", height=40, width=170)
+        self.addpassbtn = customtkinter.CTkButton(self.mainbarright, text="Add Password", height=40, width=170, command=self.AddPsw)
 
         self.rempassbtn = customtkinter.CTkButton(self.mainbarright, text="Delete Password", height=40, width=170, command=self.deletepsw)
 
@@ -98,6 +99,11 @@ class SafeMan(customtkinter.CTk):
             self.placeIntroButtons()
 
     
+    def AddPsw(self):
+        if messagebox.askyesno("Add Password", "Are you sure to add new password to the vault?", parent=self):
+            addpsw_window.PswAdd()
+
+
     def UnlPsw(self):
         if(self.radiobutton_frame.get_checked_item() == ""):
             messagebox.showwarning("Error", "Please select a file to unlock.", parent=self)
@@ -135,6 +141,7 @@ class SafeMan(customtkinter.CTk):
         if os.path.exists(f"{pwd}/.safeman-psw"):
             self.subdir_file_arr = []
             for i in range (0, len(self.radiobutton_frame.radiobutton_list)):
+                print(self.radiobutton_frame.all_items[i])
                 self.radiobutton_frame.item_remove(self.radiobutton_frame.all_items[i])
 
             for main_path, sub_directories, files in os.walk(f"{pwd}/.safeman-psw"):

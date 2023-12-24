@@ -16,8 +16,7 @@ class UnlockPsw(customtkinter.CTkToplevel):
         self.title("Passphrase Entry for Password Decryption")
         width = 500
         height = 190
-
-        app_window.SafeMan.refresh()
+        
         self.grab_set()
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
@@ -56,6 +55,8 @@ class UnlockPsw(customtkinter.CTkToplevel):
                 out = subprocess.check_output(command1, universal_newlines=False, shell=False, stderr=subprocess.DEVNULL)
 
                 messagebox.showinfo("Success", f"Your password is {str(out)}")
+                kill_command = ["gpgconf", "--kill", "gpg-agent"]
+                kill_out = subprocess.check_output(kill_command, universal_newlines=False, shell=False, stderr=subprocess.DEVNULL)
                 self.destroy()
                 self.passphrase = ""
 

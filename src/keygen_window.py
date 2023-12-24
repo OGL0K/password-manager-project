@@ -46,7 +46,7 @@ class KeyGen(customtkinter.CTkToplevel):
 
         def validate(P):    
             if len(P) > 20:
-                messagebox.showinfo('Character Limit', 'Your input should not be longer than 30 characters.', parent=self)
+                messagebox.showinfo('Character Limit', 'Your input should not be longer than 20 characters.', parent=self)
                 return False
             elif len(P) <= 20:
                 return True
