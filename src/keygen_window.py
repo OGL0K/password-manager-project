@@ -87,7 +87,7 @@ class KeyGen(customtkinter.CTkToplevel):
         else:
             entryChance -= 1
             if entryChance <= 0:
-                messagebox.showinfo('', 'Symmetric encryption could not be completed due to incorrent passphrase input.', parent=self)
+                messagebox.showinfo('', 'Vault generation could not be completed due to incorrent passphrase input.', parent=self)
                 self.re_passphrase = ""
                 self.passphrase = ""
                 self.destroy()
