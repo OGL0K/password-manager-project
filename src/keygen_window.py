@@ -3,7 +3,6 @@ import re
 import gnupg
 import customtkinter
 
-import app_window
 from tkinter import messagebox
 
 #Global Variables
@@ -55,7 +54,7 @@ class KeyGen(customtkinter.CTkToplevel):
         self.input_entry = customtkinter.CTkEntry(self, width=270, validate="key", validatecommand=self.vcmd)
         self.input_entry.place(x=80,y=63)
     
-
+    #Checks the passphrases and if they are correspond gpg key will be generated.
     def vaultGeneration(self, event):
         global entryChance
         self.re_passphrase = self.input_entry4.get()
@@ -94,7 +93,7 @@ class KeyGen(customtkinter.CTkToplevel):
             else:
                 messagebox.showinfo('Bad Passphrase', f'Passphrases do not match (try {entryChance} out of 3)', parent=self)
 
-
+    #Checks the strength of the passphrase and prompts the re-typed passphrase.
     def checkPassphrase(self, event):
         self.bind('<Return>', self.vaultGeneration)
         special_characters = "!@#$%^&*()-+?_=,<>/"
@@ -132,7 +131,7 @@ class KeyGen(customtkinter.CTkToplevel):
                     self.enter_button.place(x=110,y=110)
                     self.cancel_button.place(x=195,y=110)
 
-
+    #Checks the email and if entered correctly function prompts the passphrase.
     def checkEmail(self, event):
         self.bind('<Return>', self.checkPassphrase)
         self.gtEmail = self.input_entry2.get()
@@ -162,7 +161,7 @@ class KeyGen(customtkinter.CTkToplevel):
             messagebox.showinfo('Invalid Email','The email address you put is not valid.', parent=self)
 
 
-
+    #Checks the name and if entered correctly function prompts the email.
     def checkName(self, event):
         self.bind('<Return>', self.checkEmail)
         self.gtname = self.input_entry.get()

@@ -3,7 +3,6 @@ import subprocess
 import customtkinter
 
 from tkinter import messagebox
-import app_window
 
 #Global Variables
 passpEntry = 3
@@ -28,6 +27,7 @@ class UnlockPsw(customtkinter.CTkToplevel):
         self.resizable(False,False)
         self.protocol("WM_DELETE_WINDOW", self.disable_close)
         self.get_path = pswPath
+        self.bind('<Return>', self.encrptPsw)
         
         label2 = customtkinter.CTkLabel(self, text="Passphrase Entry for Decryption", font=customtkinter.CTkFont(size=20, weight="bold"))
         label2.place(x=40,y=10)
@@ -47,17 +47,18 @@ class UnlockPsw(customtkinter.CTkToplevel):
         exit_button = customtkinter.CTkButton(self, text="Cancel Backup", width=60, command= self.cancelProcess)
         exit_button.place(x=225,y=140)
 
-        
-    def encrptPsw(self):
+    #Checks the passphrase. If its correct, the password will be decrypted and shown to the user.
+    def encrptPsw(self, event):
         if self.passp_entry:
             try:
                 command1 = ["gpg", "-d", "--quiet", "--yes", "--pinentry-mode=loopback", f"--passphrase={self.passp_entry.get()}", f'{self.get_path}']
                 out = subprocess.check_output(command1, universal_newlines=False, shell=False, stderr=subprocess.DEVNULL)
 
-                messagebox.showinfo("Success", f"Your password is {str(out)}")
+                messagebox.showinfo("Success", f"Your password is: {str(out.decode('utf-8'))}", parent=self)
                 kill_command = ["gpgconf", "--kill", "gpg-agent"]
                 kill_out = subprocess.check_output(kill_command, universal_newlines=False, shell=False, stderr=subprocess.DEVNULL)
                 self.destroy()
+                self.get_path = ""
                 self.passphrase = ""
 
             except subprocess.CalledProcessError:

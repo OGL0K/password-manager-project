@@ -1,4 +1,5 @@
 import os
+import shutil
 import customtkinter
 import keygen_window
 import unlpsw_window
@@ -71,7 +72,7 @@ class SafeMan(customtkinter.CTk):
 
         self.rfrshbtn = customtkinter.CTkButton(self.toolbar, text="Refresh Vault", height=40, width=120, command=self.refresh)
 
-        self.chngbtn = customtkinter.CTkButton(self.toolbar, text="Ecnrypt Vault with New Key", height=40, width=180)
+        self.dltvltbtn = customtkinter.CTkButton(self.toolbar, text="Delete Vault", height=40, width=140, hover_color="darkred", command=self.deleteVault)
 
         self.mainbarright = customtkinter.CTkFrame(self, width=220, height=240, corner_radius=20)
 
@@ -98,12 +99,21 @@ class SafeMan(customtkinter.CTk):
         else:
             self.placeIntroButtons()
 
-    
+    #Permanently deletes the vault.
+    def deleteVault(self):
+        if messagebox.askyesno("Delete Vault", "Are you sure to delete your vault?", parent=self):
+            if messagebox.askyesno("Delete Vault", "Warning! You are in the process of deleting your vault. Please make sure you have saved your passwords since you will not be able to access them after you delete your vault. Are you sure to delete your vault?", parent=self):
+                shutil.rmtree(f"{pwd}/.safeman-psw")
+                self.placeIntroButtons()
+                messagebox.showinfo("Vault Deleted", "We are sad to see you go but you can always create a new vault by clicking 'Create Vault' button. Bear in mind that your former GPG key still lingers on your computer, and the choice of what to do with it is yours.", parent=self)
+
+    #Adds password to the vault.            
     def AddPsw(self):
         if messagebox.askyesno("Add Password", "Are you sure to add new password to the vault?", parent=self):
             addpsw_window.PswAdd()
 
 
+    #Unlocks the selected password
     def UnlPsw(self):
         if(self.radiobutton_frame.get_checked_item() == ""):
             messagebox.showwarning("Error", "Please select a file to unlock.", parent=self)
@@ -141,7 +151,6 @@ class SafeMan(customtkinter.CTk):
         if os.path.exists(f"{pwd}/.safeman-psw"):
             self.subdir_file_arr = []
             for i in range (0, len(self.radiobutton_frame.radiobutton_list)):
-                print(self.radiobutton_frame.all_items[i])
                 self.radiobutton_frame.item_remove(self.radiobutton_frame.all_items[i])
 
             for main_path, sub_directories, files in os.walk(f"{pwd}/.safeman-psw"):
@@ -157,7 +166,7 @@ class SafeMan(customtkinter.CTk):
             self.placeIntroButtons()
 
 
-    #Deletes password from the vault.
+    #Deletes the selected password from the vault.
     def deletepsw(self):
     
         if(self.radiobutton_frame.get_checked_item() == ""):
@@ -182,8 +191,8 @@ class SafeMan(customtkinter.CTk):
         self.fndVaultbtn.place_forget()
 
 
-        self.rfrshbtn.place(x=387, y=12)
-        self.chngbtn.place(x=527, y=12)
+        self.rfrshbtn.place(x=397, y=12)
+        self.dltvltbtn.place(x=547, y=12)
         self.mainbarright.place(x=490, y=90)
         self.addpassbtn.place(x=25, y=30)
         self.rempassbtn.place(x=25, y=100)
@@ -193,7 +202,7 @@ class SafeMan(customtkinter.CTk):
         
     def placeIntroButtons(self):
         self.rfrshbtn.place_forget()
-        self.chngbtn.place_forget()
+        self.dltvltbtn.place_forget()
         self.mainbarright.place_forget()
         self.addpassbtn.place_forget()
         self.rempassbtn.place_forget()
@@ -206,25 +215,7 @@ class SafeMan(customtkinter.CTk):
         self.introlbl2.place(x=55, y=55)
         self.initVaultbtn.place(x=110, y=130)
         self.fndVaultbtn.place(x=320, y=130)
-
-
-    def disable_button(self):
-        self.rfrshbtn.configure(state= customtkinter.DISABLED)
-        self.chngbtn.configure(state= customtkinter.DISABLED)
-        self.addpassbtn.configure(state= customtkinter.DISABLED)
-        self.rempassbtn.configure(state= customtkinter.DISABLED)
-        self.unlpassbtn.configure(state= customtkinter.DISABLED)
-        self.initVaultbtn.configure(state= customtkinter.DISABLED)
     
-
-    def enable_button(self):
-        self.rfrshbtn.configure(state= customtkinter.NORMAL)
-        self.chngbtn.configure(state= customtkinter.NORMAL)
-        self.addpassbtn.configure(state= customtkinter.NORMAL)
-        self.rempassbtn.configure(state= customtkinter.NORMAL)
-        self.unlpassbtn.configure(state= customtkinter.NORMAL)
-        self.initVaultbtn.configure(state= customtkinter.NORMAL)
-
 
     def quit_app(self):
         quit_question = messagebox.askquestion('Exit App', 'Are you sure exitting the applicaiton?', parent=self).upper()
