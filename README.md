@@ -4,6 +4,10 @@ SafeMan application is a local password manager for UNIX based systems and has b
 
 SafeMan provides an easy user interface to save and manage your passwords. In terms security, SafeMan application utilises gnupg encryption-decryption.
 
+![](readme_img/main_window.png)
+| _Main menu of SafeMan_
+###
+
 ## Required Packages
 Install required packages with pip:
 ```
